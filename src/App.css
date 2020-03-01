@@ -1,4 +1,4 @@
-#background {
+/* #background {
   z-index: 1
 }
 
@@ -7,9 +7,145 @@
 }
 canvas {
   position: absolute
-}
-
-#testingui{
+} */
+/* 
+#testingview{
   position: absolute;
   top: 300px
+} */
+
+
+.container{
+  position: absolute;
+  width:400px;
+  height:400px;
+  background-color: #d3d2d9
+}
+
+.outer-circle{
+  z-index: 1;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top:50%;
+  left:50%;
+  width: 240px;
+  height: 240px;
+  background-color: #f8f8f8;
+  border-radius: 100%
+}
+
+.inner-circle{
+  z-index: 2;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top:50%;
+  left:50%;
+  width: 220px;
+  height: 220px;
+  background-color: #fff;
+  border-radius: 100%;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.thermostat-border {
+  z-index: 3;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top:50%;
+  left:50%;
+  width: 200px;
+  height: 200px;
+  background-image: linear-gradient(90deg, #5495CA , #FD635A);
+  border-radius: 100%;
+}
+
+.grey-quadrant {
+  z-index: 4;
+  position: absolute;
+  background-color: #51565c;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height:100px;
+  border-radius: 0 0 100% 0;
+  transform: rotate(45deg);
+  transform-origin: top left;
+}
+
+.thermostat-bg, .thermostat-gradient {
+  z-index: 5;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top:50%;
+  left:50%;
+  width: 190px;
+  height: 190px;
+  border-radius: 100%;
+}
+
+.thermostat-gradient.off{
+  animation-name: clearToGrey;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  background-color: #586367
+}
+
+.thermostat-gradient.heating{
+  animation-name: greyToClear;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  background-color: #586367
+}
+
+.thermostat-gradient.cooling{
+  animation-name: greyToClear;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  background-color: #586367
+}
+
+.sun-logo {
+  z-index: 7;
+  position: absolute;
+  width:20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  left:50%;
+  top: 260px;
+  opacity: 0.3
+}
+
+canvas {
+  z-index: 8;
+  position: absolute
+}
+
+.temp {
+  z-index: 6;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top:50%;
+  left:50%;
+  color: white;
+  text-align: center;
+  font-weight: 600
+}
+
+.target-temp {
+  font-size: 48px;
+}
+
+.testingview {
+  position: absolute;
+  top: 400px
+}
+
+@keyframes clearToGrey{
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes greyToClear{
+  from {opacity: 1;}
+  to {opacity: 0;}
 }

@@ -1,27 +1,41 @@
 import React from 'react';
 import './App.css';
-import MainPanel from './components/MainPanel';
-import TestingUI from './components/TestingUI';
+import RadialSliderView from './components/RadialSliderView';
+import TestingView from './components/TestingView';
+import RadialSliderModel from './components/RadialSliderModel';
 
 class App extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      current_temp: 72
+      radialSliderModel: new RadialSliderModel()
     }
   }
 
-  onCurrentTempChange = event => {
-    this.setState({current_temp: event.target.value})
+  setTargetTemp = newTemp => {
+    const model = this.state.radialSliderModel
+    model.setTargetTemp(newTemp)
+    this.setState({radialSliderModel: model})
+  }
+
+  setCurrentTemp = newTemp => {
+    const model = this.state.radialSliderModel
+    model.setCurrentTemp(newTemp)
+    this.setState({radialSliderModel: model})
   }
 
   render() {
-    const { current_temp } = this.state
+    const {current_temperature, target_temperature, mode} = this.state.radialSliderModel
     return (
       <div className="App">
-        <MainPanel current_temp={current_temp}/>
-        <TestingUI current_temp={current_temp} onCurrentTempChange={this.onCurrentTempChange}/>
+        <RadialSliderView 
+          currentTemp={current_temperature} 
+          targetTemp={target_temperature}
+          mode={mode}
+          setTargetTemp={this.setTargetTemp}
+          />
+        <TestingView currentTemp={current_temperature} setCurrentTemp={this.setCurrentTemp}/>
       </div>
     );
   }

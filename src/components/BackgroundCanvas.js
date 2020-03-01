@@ -3,7 +3,7 @@ import React from 'react';
 class BackgroundCanvas extends React.Component {
 
     componentDidMount() {
-        this.renderBackground()
+        // this.renderBackground()
     }
 
     renderBackground() {
@@ -36,7 +36,9 @@ class BackgroundCanvas extends React.Component {
     render() {
         const { canvas_width, canvas_height } = this.props.canvas_dimens
         return (
-            <canvas id="background" ref="canvas" width={canvas_width} height={canvas_height} />
+            // <canvas id="background" ref="canvas" width={canvas_width} height={canvas_height} />
+            <div class="container">
+            </div>
         );
     }
 }
