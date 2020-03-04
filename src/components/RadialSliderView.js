@@ -11,18 +11,21 @@ class RadialSliderView extends React.Component {
   }
 
   componentDidMount() {
-    const currentTemp = this.props.currentTemp
+    const targetTemp = this.props.targetTemp
     this.renderTicks()
-    this.renderDot(Math.PI/2 + (currentTemp-50)/30 * 2 * Math.PI)
+    const angle = (targetTemp-50)/30*300 + 30
+    this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+    const canvas = this.refs.canvas
+    canvas.addEventListener('wheel', event => event.preventDefault(), {passive: false})
   }
 
   componentDidUpdate(prevProps) {
     const newMode = this.props.mode
     const oldMode = prevProps.mode
-    if(newMode === "heating" && oldMode !== "heating") {
-      this.setState({currentColor: "#FD635A"})
-    } else if(newMode === "cooling" && oldMode !== "cooling") {
-      this.setState({currentColor: "#5495CA"})
+    if (newMode === "heating" && oldMode !== "heating") {
+      this.setState({ currentColor: "#FD635A" })
+    } else if (newMode === "cooling" && oldMode !== "cooling") {
+      this.setState({ currentColor: "#5495CA" })
     }
   }
 
@@ -40,11 +43,11 @@ class RadialSliderView extends React.Component {
 
   renderDot(angle) {
     const ctx = this.refs.canvas.getContext("2d")
-    ctx.clearRect(0,0,400,400)
+    ctx.clearRect(0, 0, 400, 400)
     this.renderTicks()
     ctx.beginPath()
-    ctx.ellipse(200 + 90*Math.cos(angle), 200 + 90 * Math.sin(angle), 5, 5, angle, 0, 2 * Math.PI)
-    ctx.fillStyle="yellow"
+    ctx.ellipse(200 + 90 * Math.cos(angle), 200 + 90 * Math.sin(angle), 5, 5, angle, 0, 2 * Math.PI)
+    ctx.fillStyle = "yellow"
     ctx.fill()
   }
 
@@ -62,17 +65,33 @@ class RadialSliderView extends React.Component {
       if (angle > 30 && angle < 330) {
         const temp = Math.round(((angle - 30) / 300) * 30 + 50);
         setTargetTemp(temp)
-        this.renderDot(Math.PI/2 + angle/360 * 2 * Math.PI)
+        this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
       }
     }
   }
 
+  handleScroll = event => {
+    const scrollDirection = event.nativeEvent.deltaY
+    console.log(scrollDirection)
+    const { targetTemp, setTargetTemp } = this.props
+    if (scrollDirection > 0 && targetTemp < 80) {
+      setTargetTemp(targetTemp + 1)
+      const angle = (targetTemp+1-50)/30*300 + 30
+      this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+    } else if (scrollDirection < 0 && targetTemp > 50) {
+      setTargetTemp(targetTemp - 1)
+      const angle = (targetTemp-1-50)/30*300 + 30
+      this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+
+    }
+  }
+
   handleMouseDown = () => {
-    this.setState({mousedown: true})
+    this.setState({ mousedown: true })
   }
 
   handleMouseUp = () => {
-    this.setState({mousedown: false})
+    this.setState({ mousedown: false })
   }
 
   render() {
@@ -85,17 +104,18 @@ class RadialSliderView extends React.Component {
         <div class="inner-circle"></div>
         <div class="thermostat-border"></div>
         <div class="grey-quadrant"></div>
-        <div class="thermostat-bg" style={{backgroundColor: this.state.currentColor}}></div>
+        <div class="thermostat-bg" style={{ backgroundColor: this.state.currentColor }}></div>
         <div class={`thermostat-gradient ${mode}`}></div>
         <div class="temp">
           <div class="target-temp">{targetTemp}</div>
           <div class="current-temp">Current: {currentTemp}</div>
         </div>
-        <img class="sun-logo" src={sunLogo} alt="sun"/>
+        <img class="sun-logo" src={sunLogo} alt="sun" />
         <canvas ref="canvas" width="400" height="400"
           onMouseMove={this.handleMouseMove}
           onMouseDown={this.handleMouseDown}
-          onMouseUp={this.handleMouseUp} />
+          onMouseUp={this.handleMouseUp}
+          onWheel={this.handleScroll} />
       </div>
     );
   }
