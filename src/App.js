@@ -26,16 +26,19 @@ class App extends React.Component {
   }
 
   render() {
-    const {current_temperature, target_temperature, mode} = this.state.radialSliderModel
+    const { currentTemp, targetTemp, mode } = this.state.radialSliderModel
     return (
       <div className="App">
         <RadialSliderView 
-          currentTemp={current_temperature} 
-          targetTemp={target_temperature}
+          currentTemp={currentTemp} 
+          targetTemp={targetTemp}
           mode={mode}
           setTargetTemp={this.setTargetTemp}
           />
-        <TestingView currentTemp={current_temperature} setCurrentTemp={this.setCurrentTemp}/>
+        <TestingView 
+          currentTemp={currentTemp} 
+          setCurrentTemp={this.setCurrentTemp}
+          />
       </div>
     );
   }

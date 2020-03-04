@@ -12,9 +12,12 @@ class RadialSliderView extends React.Component {
 
   componentDidMount() {
     const targetTemp = this.props.targetTemp
-    this.renderTicks()
     const angle = (targetTemp-50)/30*300 + 30
-    this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+
+    // render canvas
+    this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+
+    // disable scroll on canvas
     const canvas = this.refs.canvas
     canvas.addEventListener('wheel', event => event.preventDefault(), {passive: false})
   }
@@ -22,15 +25,21 @@ class RadialSliderView extends React.Component {
   componentDidUpdate(prevProps) {
     const newMode = this.props.mode
     const oldMode = prevProps.mode
+    
     if (newMode === "heating" && oldMode !== "heating") {
+      // change in state to heating
       this.setState({ currentColor: "#FD635A" })
     } else if (newMode === "cooling" && oldMode !== "cooling") {
+      // change in state to cooling
       this.setState({ currentColor: "#5495CA" })
     }
   }
 
-  renderTicks() {
+  renderCanvas(angle) {
     const ctx = this.refs.canvas.getContext("2d")
+    ctx.clearRect(0, 0, 400, 400) // clear canvas
+    
+    // redraw indicator ticks
     for (var i = 5; i < 60 - 4; i++) {
       const angle = Math.PI / 2 + (i / 60) * 2 * Math.PI;
       ctx.beginPath();
@@ -39,12 +48,7 @@ class RadialSliderView extends React.Component {
       ctx.fill();
     }
 
-  }
-
-  renderDot(angle) {
-    const ctx = this.refs.canvas.getContext("2d")
-    ctx.clearRect(0, 0, 400, 400)
-    this.renderTicks()
+    // redraw yellow dot
     ctx.beginPath()
     ctx.ellipse(200 + 90 * Math.cos(angle), 200 + 90 * Math.sin(angle), 5, 5, angle, 0, 2 * Math.PI)
     ctx.fillStyle = "yellow"
@@ -65,24 +69,22 @@ class RadialSliderView extends React.Component {
       if (angle > 30 && angle < 330) {
         const temp = Math.round(((angle - 30) / 300) * 30 + 50);
         setTargetTemp(temp)
-        this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+        this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
       }
     }
   }
 
   handleScroll = event => {
     const scrollDirection = event.nativeEvent.deltaY
-    console.log(scrollDirection)
     const { targetTemp, setTargetTemp } = this.props
     if (scrollDirection > 0 && targetTemp < 80) {
       setTargetTemp(targetTemp + 1)
       const angle = (targetTemp+1-50)/30*300 + 30
-      this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+      this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
     } else if (scrollDirection < 0 && targetTemp > 50) {
       setTargetTemp(targetTemp - 1)
       const angle = (targetTemp-1-50)/30*300 + 30
-      this.renderDot(Math.PI / 2 + angle / 360 * 2 * Math.PI)
-
+      this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
     }
   }
 
