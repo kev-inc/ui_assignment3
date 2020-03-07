@@ -1,41 +1,100 @@
-import { Machine } from 'xstate'
-import Thermostat from '../model/Thermostat.model'
+import { Machine, assign } from 'xstate'
+
+const addTarget = assign({
+  target: (context, event) => context.target + 1
+})
+
+const minusTarget = assign({
+  target: (context, event) => context.target - 1
+})
+
+const setCurrent = assign({
+  current: (context, event) => event.currentTemp
+})
+
+const setTarget = assign({
+  target: (context, event) => event.targetTemp
+})
+
+function moreThan80(context, event) {
+  return context.target >= 80;
+}
+
+function lessThan80(context, event) {
+  return context.target < 80;
+}
+
+function moreThan50(context, event) {
+  return context.target > 50;
+}
+
+function lessThan50(context, event) {
+  return context.target <= 50;
+}
+
+function enableHeating(context, event) {
+  const {target, current, dT, dTheat} = context
+  return current < target - dT - dTheat
+}
+
+function enableCooling(context, event) {
+  const {target, current, dT, dTcool} = context
+  return current > target + dT + dTcool
+}
+
+function disableAll(context, event) {
+  const {target, current, dT, dTheat, dTcool} = context
+  return ((current > target - (dT - dTheat)) && (current < target + (dT - dTcool)))
+}
 
 const changeTemp = {
   id: 'changeTemp',
   initial: 'armed',
-  states:{
+  states: {
     armed: {
       on: {
         CLOCKWISE: 'increment_check',
-        ANITCLOCKWISE: 'decrement_check'
-      }
+        ANTICLOCKWISE: 'decrement_check'
+      },
     },
     increment_check: {
       on: {
-        pass: 'increment_update',
-        fail: 'armed'
+        '': [{
+          target: 'increment_update',
+          cond: 'lessThan80'
+        }, {
+          target: 'armed',
+          cond: 'moreThan80'
+        }]
       }
     },
     decrement_check: {
       on: {
-        pass: 'decrement_update',
-        fail: 'armed'
+        '': [{
+          target: 'decrement_update',
+          cond: 'moreThan50'
+        }, {
+          target: 'armed',
+          cond: 'lessThan50'
+        }]
       }
     },
     increment_update: {
       on: {
-        add: 'armed'
+        '': {
+          target:'armed',
+          actions: 'addTarget'
+        }
       }
     }, 
     decrement_update: {
       on: {
-        minus: 'armed'
+        '': {
+          target:'armed',
+          actions: 'minusTarget'
+        }
       }
     }
-  },
-  on: {
-    mouseUp: 'modes.hist'
   }
 }
 
@@ -45,42 +104,68 @@ const modes = {
   states: {
     off: {
       on: {
-        TOO_HOT: 'cooling',
-        TOO_COLD: 'heating'
+        '': [{
+          target: 'heating',
+          cond: 'enableHeating'
+        }, {
+          target: 'cooling',
+          cond: 'enableCooling'
+        }]
       }
     },
     heating: {
       on: {
-        OK: 'off',
-        TOO_HOT: 'cooling'
+        '': [{
+          target: 'off',
+          cond: 'disableAll'
+        }, {
+          target: 'cooling',
+          cond: 'enableCooling'
+        }]
       }
     },
     cooling: {
       on: {
-        OK: 'off',
-        TOO_COLD: 'heating'
+        '': [{
+          target: 'off',
+          cond: 'disableAll'
+        }, {
+          target: 'heating',
+          cond: 'enableHeating'
+        }]
       }
-    }, 
-    hist: { type: 'history' }
-  },
-  on: {
-    mouseDown: 'changeTemp'
+    }
   }
 }
 
 const thermostat = {
   id: 'thermostat',
+  type:'parallel',
   context: {
-    model: new Thermostat(72, 72, 2, 1.5, 1)
+    target: 72,
+    current: 72,
+    dT: 2,
+    dTcool: 1.5,
+    dTheat: 1
   },
   initial: 'modes',
   states: {
     modes: modes,
-    changeTemp: changeTemp
+    changeTemp: changeTemp,
+    setTemp: {
+      on: {
+        setCurrent: {
+          actions: 'setCurrent'
+        },
+        setTarget: {
+          actions: 'setTarget'
+        }
+      }
+    }
   }
 }
 
-
-
-
-export const thermostatMachine = Machine(thermostat);
+export const ThermostatMachine = Machine(thermostat, {
+  actions: { addTarget, minusTarget, setCurrent, setTarget},
+  guards: {moreThan80, lessThan80, moreThan50, lessThan50, enableHeating, enableCooling, disableAll}
+});

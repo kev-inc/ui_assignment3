@@ -1,49 +1,20 @@
 import React from 'react';
 import './App.css';
-import RadialSliderView from './components/RadialSliderView';
 import TestingView from './components/TestingView';
 import RadialSliderModel from './components/RadialSliderModel';
 import ThermostatView from './view/ThermostatView';
 
-class App extends React.Component {
+import { useMachine } from '@xstate/react'
+import { ThermostatMachine } from './statechart/ThermostatMachine'
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      radialSliderModel: new RadialSliderModel()
-    }
-  }
+export default function App() {
 
-  setTargetTemp = newTemp => {
-    const model = this.state.radialSliderModel
-    model.setTargetTemp(newTemp)
-    this.setState({radialSliderModel: model})
-  }
+  const thermostatMachine = useMachine(ThermostatMachine)
 
-  setCurrentTemp = newTemp => {
-    const model = this.state.radialSliderModel
-    model.setCurrentTemp(newTemp)
-    this.setState({radialSliderModel: model})
-  }
-
-  render() {
-    const { currentTemp, targetTemp, mode } = this.state.radialSliderModel
-    return (
-      <div className="App">
-        {/* <RadialSliderView 
-          currentTemp={currentTemp} 
-          targetTemp={targetTemp}
-          mode={mode}
-          setTargetTemp={this.setTargetTemp}
-          /> */}
-        <ThermostatView/>
-        <TestingView 
-          currentTemp={currentTemp} 
-          setCurrentTemp={this.setCurrentTemp}
-          />
-      </div>
-    );
-  }
+  return (
+    <div className="App">
+      <ThermostatView thermostatMachine={thermostatMachine}/>
+      <TestingView thermostatMachine={thermostatMachine}/>
+    </div>
+  );
 }
-
-export default App;
