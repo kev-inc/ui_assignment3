@@ -3,6 +3,7 @@ import './App.css';
 import RadialSliderView from './components/RadialSliderView';
 import TestingView from './components/TestingView';
 import RadialSliderModel from './components/RadialSliderModel';
+import ThermostatView from './view/ThermostatView';
 
 class App extends React.Component {
 
@@ -29,12 +30,13 @@ class App extends React.Component {
     const { currentTemp, targetTemp, mode } = this.state.radialSliderModel
     return (
       <div className="App">
-        <RadialSliderView 
+        {/* <RadialSliderView 
           currentTemp={currentTemp} 
           targetTemp={targetTemp}
           mode={mode}
           setTargetTemp={this.setTargetTemp}
-          />
+          /> */}
+        <ThermostatView/>
         <TestingView 
           currentTemp={currentTemp} 
           setCurrentTemp={this.setCurrentTemp}
