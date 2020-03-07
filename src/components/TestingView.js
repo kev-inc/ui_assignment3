@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function TestingView(props) {
 
-  const [current, send] = props.thermostatMachine
+  const [current, send] = props.thermostatModel
   const currentTemp = current.context.current
 
   return(

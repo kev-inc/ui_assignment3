@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import sunLogo from '../sun.png'
 
 export default class ThermostatView extends React.Component{
@@ -11,20 +11,29 @@ export default class ThermostatView extends React.Component{
   }
 
   componentDidMount() {
-    const [current, send] = this.props.thermostatMachine
+    // get model
+    const [current, send] = this.props.thermostatModel
+    // get target temp
     const targetTemp = current.context.target
+    // calculate position of yellow dot
     const angle = (targetTemp-50)/30*300 + 30
+    // render yellow dot
     this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
   }
 
   componentDidUpdate() {
-    const [current, send] = this.props.thermostatMachine
-    const targetTemp = current.context.target
-    const angle = (targetTemp-50)/30*300 + 30
-    this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+   // get model
+   const [current, send] = this.props.thermostatModel
+   // get target temp
+   const targetTemp = current.context.target
+   // calculate position of yellow dot
+   const angle = (targetTemp-50)/30*300 + 30
+   // render yellow dot
+   this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
   }
 
   getBgColor(mode) {
+    // calculate color of thermostat based on current state
     switch(mode) {
       case "heating": return "#FD635A" 
       break
@@ -36,7 +45,9 @@ export default class ThermostatView extends React.Component{
 
   renderCanvas(angle) {
     const ctx = this.refs.canvas.getContext("2d")
-    ctx.clearRect(0, 0, 400, 400) // clear canvas
+
+    // clear canvas
+    ctx.clearRect(0, 0, 400, 400) 
   
     // redraw indicator ticks
     for (var i = 5; i < 60 - 4; i++) {
@@ -55,11 +66,13 @@ export default class ThermostatView extends React.Component{
   }
 
   handleScroll = event => {
-    const [current, send] = this.props.thermostatMachine
+    const [current, send] = this.props.thermostatModel
     const scrollDirection = event.nativeEvent.deltaY
     if (scrollDirection > 0) {
+      // scroll upwards
       send("CLOCKWISE")
     } else if (scrollDirection < 0) {
+      // scroll downwards
       send("ANTICLOCKWISE")
     }
   }
@@ -73,10 +86,12 @@ export default class ThermostatView extends React.Component{
   }
   
   handleMouseMove(nativeEvent) {
+    // dimensions of canvas
     const canvas_width = 400
     const canvas_height = 400
+    
     const { mouseDown } = this.state;
-    const [current, send] = this.props.thermostatMachine
+    const [current, send] = this.props.thermostatModel
     if(mouseDown) {
       const canvas = this.refs.canvas;
       const rect = canvas.getBoundingClientRect();
@@ -84,6 +99,8 @@ export default class ThermostatView extends React.Component{
       const xCoord = nativeEvent.x - rect.left - canvas_width / 2;
       const angle = (Math.atan2(xCoord, -yCoord) / Math.PI) * 180 + 180;
       if (angle > 30 && angle < 330) {
+        // position of mouse is within the accepted limits of thermostat
+        // calculate temp based on position of mouse
         const temp = Math.round(((angle - 30) / 300) * 30 + 50);
         send("setTarget", {targetTemp: temp})
       }
@@ -91,7 +108,7 @@ export default class ThermostatView extends React.Component{
   }
 
   render() {
-    const [current, send] = this.props.thermostatMachine
+    const [current, send] = this.props.thermostatModel
     const currentTemp = current.context.current
     const targetTemp = current.context.target
     const mode = current.value.modes
