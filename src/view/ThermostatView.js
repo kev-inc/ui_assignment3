@@ -32,17 +32,6 @@ export default class ThermostatView extends React.Component{
    this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
   }
 
-  getBgColor(mode) {
-    // calculate color of thermostat based on current state
-    switch(mode) {
-      case "heating": return "#FD635A" 
-      break
-      case "cooling": return "#5495CA"
-      break
-      default: return "#586367"
-    }
-  }
-
   renderCanvas(angle) {
     const ctx = this.refs.canvas.getContext("2d")
 
@@ -118,8 +107,7 @@ export default class ThermostatView extends React.Component{
         <div class="inner-circle"></div>
         <div class="thermostat-border"></div>
         <div class="grey-quadrant"></div>
-        <div class="thermostat-bg" style={{ backgroundColor: this.getBgColor(mode) }}></div>
-        <div class={`thermostat-gradient ${mode}`}></div>
+        <div class={`thermostat-bg ${mode}`} ></div>
         <div class="temp">
           <div class="target-temp">{targetTemp}</div>
           <div class="current-temp">Current: {currentTemp}</div>
