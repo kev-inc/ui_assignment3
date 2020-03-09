@@ -19,6 +19,10 @@ export default class ThermostatView extends React.Component{
     const angle = (targetTemp-50)/30*300 + 30
     // render yellow dot
     this.renderCanvas(Math.PI / 2 + angle / 360 * 2 * Math.PI)
+    
+    // prevent default for canvas
+    const canvas = this.refs.canvas
+    canvas.addEventListener("wheel", e => e.preventDefault())
   }
 
   componentDidUpdate() {
